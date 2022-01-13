@@ -8,6 +8,7 @@
 #include "source/common/common/assert.h"
 #include "source/common/common/fmt.h"
 #include "source/common/common/perf_annotation.h"
+#include "source/common/common/utility.h"
 #include "source/common/common/regex.h"
 
 #include "absl/strings/ascii.h"
@@ -128,7 +129,7 @@ bool TagExtractorStdRegexImpl::extractTag(TagExtractionContext& context, std::ve
     // from the string but also not necessary in the tag value ("." for example). If there is no
     // second submatch, then the value_subexpr is the same as the remove_subexpr.
     const auto& value_subexpr = match.size() > 2 ? match[2] : remove_subexpr;
-    addTagReturningValueRef(tags) = value_subexpr.str();
+    addTagReturningValueRef(tags) = StringUtil::deescapePlusToDot(value_subexpr.str());
 
     // Determines which characters to remove from stat_name to elide remove_subexpr.
     std::string::size_type start = remove_subexpr.first - stat_name.begin();
@@ -176,7 +177,7 @@ bool TagExtractorRe2Impl::extractTag(TagExtractionContext& context, std::vector<
     }
 
     if (negative_match_.empty() || negative_match_ != value_subexpr) {
-      addTagReturningValueRef(tags) = std::string(value_subexpr);
+      addTagReturningValueRef(tags) = StringUtil::deescapePlusToDot(std::string(value_subexpr));
 
       // Determines which characters to remove from stat_name to elide remove_subexpr.
       std::string::size_type start = remove_subexpr.data() - stat_name.data();

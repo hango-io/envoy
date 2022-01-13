@@ -306,7 +306,8 @@ HttpConnectionManagerConfig::HttpConnectionManagerConfig(
     Config::ConfigProviderManager& scoped_routes_config_provider_manager,
     Tracing::TracerManager& tracer_manager,
     FilterConfigProviderManager& filter_config_provider_manager)
-    : context_(context), stats_prefix_(fmt::format("http.{}.", config.stat_prefix())),
+    : context_(context),
+      stats_prefix_(fmt::format("http.{}.", StringUtil::escapeDotToPlus(config.stat_prefix()))),
       stats_(Http::ConnectionManagerImpl::generateStats(stats_prefix_, context_.scope())),
       tracing_stats_(
           Http::ConnectionManagerImpl::generateTracingStats(stats_prefix_, context_.scope())),

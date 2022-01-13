@@ -232,8 +232,8 @@ ListenerFactoryContextBaseImpl::ListenerFactoryContextBaseImpl(
     const envoy::config::listener::v3::Listener& config, DrainManagerPtr drain_manager)
     : server_(server), metadata_(config.metadata()), typed_metadata_(config.metadata()),
       direction_(config.traffic_direction()), global_scope_(server.stats().createScope("")),
-      listener_scope_(
-          server_.stats().createScope(fmt::format("listener.{}.", listenerStatsScope(config)))),
+      listener_scope_(server_.stats().createScope(
+          fmt::format("listener.{}.", StringUtil::escapeDotToPlus(listenerStatsScope(config))))),
       validation_visitor_(validation_visitor), drain_manager_(std::move(drain_manager)),
       is_quic_(config.udp_listener_config().has_quic_options()) {}
 
