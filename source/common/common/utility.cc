@@ -653,4 +653,53 @@ void ExceptionUtil::throwEnvoyException(const std::string& message) {
   throw EnvoyException(message);
 }
 
+std::string StringUtil::escapeDotToPlus(absl::string_view view) {
+  std::string new_string;
+  new_string.reserve(view.size() + 8);
+
+  for (char c : view) {
+    switch (c) {
+    case '.':
+      new_string.push_back('+');
+      new_string.push_back('-');
+      break;
+    case '+':
+      new_string.push_back('+');
+      new_string.push_back('+');
+      break;
+    default:
+      new_string.push_back(c);
+    }
+  }
+
+  return new_string;
+}
+
+std::string StringUtil::deescapePlusToDot(absl::string_view view) {
+  size_t view_size = view.size();
+
+  std::string new_string;
+  new_string.reserve(view_size);
+
+  for (size_t i = 0; i < view_size; i++) {
+    char c = view[i];
+    if (c == '+') {
+      if (i + 1 < view_size) {
+        if (view[i + 1] == '+') {
+          new_string.push_back('+');
+          i = i + 1;
+          continue;
+        }
+        if (view[i + 1] == '-') {
+          new_string.push_back('.');
+          i = i + 1;
+          continue;
+        }
+      }
+    }
+    new_string.push_back(c);
+  }
+  return new_string;
+}
+
 } // namespace Envoy

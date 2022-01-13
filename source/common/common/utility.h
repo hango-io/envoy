@@ -455,6 +455,9 @@ public:
    * @return std::string the string after replaced all empty characters or space.
    */
   static std::string replaceAllEmptySpace(absl::string_view view);
+
+  static std::string escapeDotToPlus(absl::string_view view);
+  static std::string deescapePlusToDot(absl::string_view view);
 };
 
 /**
