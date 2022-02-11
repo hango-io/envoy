@@ -13,9 +13,15 @@ envoy_extension_package()
 
 envoy_cc_extension(
     name = "config",
-    srcs = ["config.cc"],
-    hdrs = ["config.h"],
-    # This is core code for the purposes of testing.
+    srcs = [
+        "config.cc",
+        "cp_file_access_log_impl.cc",
+    ],
+    hdrs = [
+        "config.h",
+        "cp_file_access_log_impl.h",
+    ],
+    # TODO(#9953) determine if this is core or should be cleaned up.
     extra_visibility = [
         "//test:__subpackages__",
     ],

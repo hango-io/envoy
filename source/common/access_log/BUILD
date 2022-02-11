@@ -10,8 +10,14 @@ envoy_package()
 
 envoy_cc_library(
     name = "access_log_lib",
-    srcs = ["access_log_impl.cc"],
-    hdrs = ["access_log_impl.h"],
+    srcs = [
+        "access_log_impl.cc",
+        "cp_access_log_impl.cc",
+    ],
+    hdrs = [
+        "access_log_impl.h",
+        "cp_access_log_impl.h",
+    ],
     external_deps = [
         "abseil_hash",
     ],
