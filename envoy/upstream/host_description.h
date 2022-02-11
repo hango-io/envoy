@@ -7,6 +7,7 @@
 
 #include "envoy/common/time.h"
 #include "envoy/config/core/v3/base.pb.h"
+#include "envoy/config/typed_metadata.h"
 #include "envoy/network/address.h"
 #include "envoy/network/transport_socket.h"
 #include "envoy/stats/primitive_stats_macros.h"
@@ -83,6 +84,8 @@ public:
    * Set the current metadata.
    */
   virtual void metadata(MetadataConstSharedPtr new_metadata) PURE;
+
+  virtual const Envoy::Config::TypedMetadata& typedMetadata() const PURE;
 
   /**
    * @return the cluster the host is a member of.

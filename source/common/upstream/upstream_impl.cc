@@ -230,7 +230,9 @@ HostDescriptionImpl::HostDescriptionImpl(
                                               Config::MetadataFilters::get().ENVOY_LB,
                                               Config::MetadataEnvoyLbKeys::get().CANARY)
                   .bool_value()),
-      metadata_(metadata), locality_(locality),
+      metadata_(metadata),
+      typed_metadata_(metadata_ ? *metadata_ : envoy::config::core::v3::Metadata()),
+      locality_(locality),
       locality_zone_stat_name_(locality.zone(), cluster->statsScope().symbolTable()),
       priority_(priority),
       socket_factory_(resolveTransportSocketFactory(dest_address, metadata_.get())),

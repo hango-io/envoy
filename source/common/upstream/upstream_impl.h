@@ -112,6 +112,7 @@ public:
       socket_factory_ = new_socket_factory;
     }
   }
+  const Envoy::Config::TypedMetadata& typedMetadata() const override { return typed_metadata_; }
 
   const ClusterInfo& cluster() const override { return *cluster_; }
   HealthCheckHostMonitor& healthChecker() const override {
@@ -182,6 +183,7 @@ private:
   std::atomic<bool> canary_;
   mutable absl::Mutex metadata_mutex_;
   MetadataConstSharedPtr metadata_ ABSL_GUARDED_BY(metadata_mutex_);
+  Envoy::Config::TypedMetadataImpl<HostTypedMetadataFactory> typed_metadata_;
   const envoy::config::core::v3::Locality locality_;
   Stats::StatNameDynamicStorage locality_zone_stat_name_;
   mutable HostStats stats_;
