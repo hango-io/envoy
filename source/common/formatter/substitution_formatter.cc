@@ -1987,7 +1987,7 @@ absl::optional<std::string>
 MetadataFormatter::formatMetadata(const envoy::config::core::v3::Metadata& metadata) const {
   ProtobufWkt::Value value = formatMetadataValue(metadata);
   if (value.kind_case() == ProtobufWkt::Value::kNullValue) {
-    return absl::nullopt;
+    return "null";
   }
 
   std::string str;
