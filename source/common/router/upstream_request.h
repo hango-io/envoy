@@ -71,6 +71,7 @@ public:
   // UpstreamToDownstream
   const RouteEntry& routeEntry() const override;
   const Network::Connection& connection() const override;
+  const Route& route() const override;
 
   void disableDataFromDownstreamForFlowControl();
   void enableDataFromDownstreamForFlowControl();

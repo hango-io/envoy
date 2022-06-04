@@ -1223,6 +1223,8 @@ public:
    * @return return the connection for the downstream stream.
    */
   virtual const Network::Connection& connection() const PURE;
+
+  virtual const Route& route() const PURE;
 };
 
 /**

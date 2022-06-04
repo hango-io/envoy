@@ -216,6 +216,7 @@ void UpstreamRequest::dumpState(std::ostream& os, int indent_level) const {
 }
 
 const RouteEntry& UpstreamRequest::routeEntry() const { return *parent_.routeEntry(); }
+const Route& UpstreamRequest::route() const { return *parent_.route(); }
 
 const Network::Connection& UpstreamRequest::connection() const {
   return *parent_.callbacks()->connection();
