@@ -300,7 +300,7 @@ message HistogramBucketSettings {
   repeated double buckets = 2 [(validate.rules).repeated = {
     min_items: 1
     unique: true
-    items {double {gt: 0.0}}
+    items {double {gte: 0.0}}
   }];
 }
 
