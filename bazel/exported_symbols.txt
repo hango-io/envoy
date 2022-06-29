@@ -1,4 +1,5 @@
 {
 	lua*;
 	envoyGo*;
+	envoy_http_lua_ffi*;
 };
