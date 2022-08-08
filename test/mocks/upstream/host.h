@@ -90,6 +90,7 @@ public:
   MOCK_METHOD(void, canary, (bool new_canary));
   MOCK_METHOD(MetadataConstSharedPtr, metadata, (), (const));
   MOCK_METHOD(void, metadata, (MetadataConstSharedPtr));
+  MOCK_METHOD(const Envoy::Config::TypedMetadata&, typedMetadata, (), (const));
   MOCK_METHOD(const ClusterInfo&, cluster, (), (const));
   MOCK_METHOD(Outlier::DetectorHostMonitor&, outlierDetector, (), (const));
   MOCK_METHOD(HealthCheckHostMonitor&, healthChecker, (), (const));
@@ -168,6 +169,7 @@ public:
   MOCK_METHOD(void, canary, (bool new_canary));
   MOCK_METHOD(MetadataConstSharedPtr, metadata, (), (const));
   MOCK_METHOD(void, metadata, (MetadataConstSharedPtr));
+  MOCK_METHOD(const Envoy::Config::TypedMetadata&, typedMetadata, (), (const));
   MOCK_METHOD(const ClusterInfo&, cluster, (), (const));
   MOCK_METHOD((std::vector<std::pair<absl::string_view, Stats::PrimitiveCounterReference>>),
               counters, (), (const));
