@@ -786,7 +786,8 @@ public:
         enabled_(!subset_config.subset_selectors().empty()),
         locality_weight_aware_(subset_config.locality_weight_aware()),
         scale_locality_weight_(subset_config.scale_locality_weight()),
-        panic_mode_any_(subset_config.panic_mode_any()), list_as_any_(subset_config.list_as_any()) {
+        panic_mode_any_(subset_config.panic_mode_any()), list_as_any_(subset_config.list_as_any()),
+        allow_redundant_keys_(subset_config.allow_redundant_keys()) {
     for (const auto& subset : subset_config.subset_selectors()) {
       if (!subset.keys().empty()) {
         subset_selectors_.emplace_back(std::make_shared<SubsetSelectorImpl>(
@@ -794,6 +795,11 @@ public:
             subset.single_host_per_subset()));
       }
     }
+
+    std::sort(subset_selectors_.begin(), subset_selectors_.end(),
+              [](const SubsetSelectorPtr& a, const SubsetSelectorPtr& b) -> bool {
+                return a->selectorKeys().size() > b->selectorKeys().size();
+              });
   }
   LoadBalancerSubsetInfoImpl()
       : LoadBalancerSubsetInfoImpl(
@@ -817,6 +823,7 @@ public:
   bool scaleLocalityWeight() const override { return scale_locality_weight_; }
   bool panicModeAny() const override { return panic_mode_any_; }
   bool listAsAny() const override { return list_as_any_; }
+  bool allowRedundantKeys() const override { return allow_redundant_keys_; }
 
 private:
   const ProtobufWkt::Struct default_subset_;
@@ -831,6 +838,7 @@ private:
   const bool scale_locality_weight_ : 1;
   const bool panic_mode_any_ : 1;
   const bool list_as_any_ : 1;
+  const bool allow_redundant_keys_{};
 };
 using DefaultLoadBalancerSubsetInfoImpl = ConstSingleton<LoadBalancerSubsetInfoImpl>;
 

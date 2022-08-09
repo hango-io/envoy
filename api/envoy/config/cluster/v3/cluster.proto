@@ -210,7 +210,7 @@ message Cluster {
 
   // Optionally divide the endpoints in this cluster into subsets defined by
   // endpoint metadata and selected by route and weighted cluster metadata.
-  // [#next-free-field: 9]
+  // [#next-free-field: 21]
   message LbSubsetConfig {
     option (udpa.annotations.versioning).previous_message_type =
         "envoy.api.v2.Cluster.LbSubsetConfig";
@@ -403,6 +403,26 @@ message Cluster {
     // :ref:`METADATA_NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetMetadataFallbackPolicy.METADATA_NO_FALLBACK>`.
     LbSubsetMetadataFallbackPolicy metadata_fallback_policy = 8
         [(validate.rules).enum = {defined_only: true}];
+
+    // If true, redunant key/value pairs are allowed in the request (route, weighted cluster or dynamic)
+    // metadata. By default, only when the request metadata has **same** keys with one of the subset
+    // selectors and the values of related keys are matched, we will get valid subset. For example:
+    //
+    // .. code-block:: json
+    //
+    //   { "subset_selectors": [
+    //       { "keys": [ "version" ] },
+    //       { "keys": [ "stage", "version" ] }
+    //   ]}
+    //
+    // A request with metadata ``{"redundant-key": "any", "stage": "prod", "version": "v1"}`` or
+    // ``{"redundant-key": "any", "version": "v1"}`` can never get valid subset even if the values of
+    // ``stage`` and ``version`` are matched because of the redunant key/value pair int the request
+    // metadata.
+    //
+    // By set this to true, only the necessary key/value pairs will be evaludated and redunant key/value
+    // pairs will be ignored.
+    bool allow_redundant_keys = 20;
   }
 
   // Configuration for :ref:`slow start mode <arch_overview_load_balancing_slow_start>`.
