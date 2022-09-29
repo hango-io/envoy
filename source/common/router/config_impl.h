@@ -390,6 +390,11 @@ private:
 
   std::vector<RouteEntryImplBaseConstSharedPtr> routes_;
   Matcher::MatchTreeSharedPtr<Http::HttpMatchingData> matcher_;
+
+  using Routes = std::vector<RouteEntryImplBaseConstSharedPtr>;
+  using RoutesPtr = std::unique_ptr<Routes>;
+  absl::flat_hash_map<std::string, RoutesPtr> quick_routes_;
+  bool quick_routes_enabled_{false};
 };
 
 using VirtualHostSharedPtr = std::shared_ptr<VirtualHostImpl>;

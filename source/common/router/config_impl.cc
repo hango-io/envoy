@@ -1765,6 +1765,40 @@ void CommonVirtualHostImpl::traversePerFilterConfig(
   }
 }
 
+namespace {
+absl::flat_hash_set<std::string> getEnvSet(const char* env_name) {
+  const char* env_values = std::getenv(env_name);
+  if (env_values == nullptr) {
+    return {};
+  }
+  const std::string env_values_str = env_values;
+
+  absl::flat_hash_set<std::string> values = absl::StrSplit(env_values_str, ' ');
+
+  for (const auto& host_value : values) {
+    ENVOY_LOG_TO_LOGGER(Logger::Registry::getLog(Logger::Id::config), debug,
+                        "Enable quick routes table for: {}", host_value);
+  }
+
+  return values;
+}
+
+bool enabledQuickRoutes(const envoy::config::route::v3::VirtualHost& virtual_host) {
+  static const absl::flat_hash_set<std::string> QuickDomains =
+      getEnvSet("ENABLE_PATH_ROUTES_FIRST_DOMAINS");
+
+  for (const auto& domain : virtual_host.domains()) {
+    if (QuickDomains.find(domain) != QuickDomains.end()) {
+      ENVOY_LOG_TO_LOGGER(Logger::Registry::getLog(Logger::Id::config), debug,
+                          "Quick routes table for: {} is enabled", domain);
+      return true;
+    }
+  }
+
+  return false;
+}
+} // namespace
+
 VirtualHostImpl::VirtualHostImpl(
     const envoy::config::route::v3::VirtualHost& virtual_host,
     const OptionalHttpFilters& optional_http_filters,
@@ -1789,6 +1823,8 @@ VirtualHostImpl::VirtualHostImpl(
     break;
   }
 
+  quick_routes_enabled_ = enabledQuickRoutes(virtual_host);
+
   if (virtual_host.has_matcher()) {
     RouteActionContext context{shared_virtual_host_, optional_http_filters, factory_context};
     RouteActionValidationVisitor validation_visitor;
@@ -1804,11 +1840,30 @@ VirtualHostImpl::VirtualHostImpl(
     }
   } else {
     for (const auto& route : virtual_host.routes()) {
+      if (quick_routes_enabled_ &&
+          route.match().path_specifier_case() == envoy::config::route::v3::RouteMatch::kPath) {
+        auto single_route = RouteEntryImplBaseConstSharedPtr{new PathRouteEntryImpl(
+            shared_virtual_host_, route, optional_http_filters, factory_context, validator)};
+        auto iter = quick_routes_.find(route.match().path());
+        if (iter == quick_routes_.end()) {
+          auto emplace_result =
+              quick_routes_.emplace(route.match().path(), std::make_unique<Routes>());
+          ASSERT(emplace_result.second);
+          iter = emplace_result.first;
+        }
+        ASSERT(iter != quick_routes_.end());
+        iter->second->push_back(single_route);
+        continue;
+      }
+
       routes_.emplace_back(createAndValidateRoute(route, shared_virtual_host_,
                                                   optional_http_filters, factory_context, validator,
                                                   validation_clusters));
     }
   }
+
+  ENVOY_LOG_TO_LOGGER(Logger::Registry::getLog(Logger::Id::config), debug,
+                      "Quick routes table size: {}", quick_routes_.size());
 }
 
 const std::shared_ptr<const SslRedirectRoute> VirtualHostImpl::SSL_REDIRECT_ROUTE{
@@ -1818,6 +1873,27 @@ RouteConstSharedPtr VirtualHostImpl::getRouteFromRoutes(
     const RouteCallback& cb, const Http::RequestHeaderMap& headers,
     const StreamInfo::StreamInfo& stream_info, uint64_t random_value,
     absl::Span<const RouteEntryImplBaseConstSharedPtr> routes) const {
+
+  // Check for a route that matches the request.
+  if (quick_routes_enabled_) {
+    auto path_entry = headers.Path();
+    if (path_entry == nullptr) {
+      return nullptr;
+    }
+    auto iter = quick_routes_.find(
+        Http::PathUtil::removeQueryAndFragment(path_entry->value().getStringView()));
+    if (iter != quick_routes_.end()) {
+      for (const auto& route : *(iter->second)) {
+        RouteConstSharedPtr route_entry = route->matches(headers, stream_info, random_value);
+        if (nullptr != route_entry) {
+          return route_entry;
+        }
+      }
+    }
+    ENVOY_LOG_TO_LOGGER(Logger::Registry::getLog(Logger::Id::router), debug,
+                        "Quick routes table miss: {}", path_entry->value().getStringView());
+  }
+
   for (auto route = routes.begin(); route != routes.end(); ++route) {
     if (!headers.Path() && !(*route)->supportsPathlessHeaders()) {
       continue;
