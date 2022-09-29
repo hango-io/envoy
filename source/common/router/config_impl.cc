@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -1874,12 +1875,33 @@ RouteConstSharedPtr VirtualHostImpl::getRouteFromRoutes(
     const StreamInfo::StreamInfo& stream_info, uint64_t random_value,
     absl::Span<const RouteEntryImplBaseConstSharedPtr> routes) const {
 
-  // Check for a route that matches the request.
-  if (quick_routes_enabled_) {
-    auto path_entry = headers.Path();
-    if (path_entry == nullptr) {
-      return nullptr;
+  auto path_entry = headers.Path();
+  if (path_entry == nullptr) {
+    return nullptr;
+  }
+
+  std::string new_path_value;
+  absl::string_view path_view = path_entry->value().getStringView();
+  const size_t len = path_view.size();
+  new_path_value.reserve(len);
+  for (size_t i = 0; i < len; i++) {
+    if (path_view[i] == '/') {
+      if (new_path_value.empty() || *new_path_value.rbegin() != '/') {
+        new_path_value.push_back('/');
+      }
+    } else if (path_view[i] == '?' || path_view[i] == '#') {
+      new_path_value.append(path_view.substr(i).data(), len - i);
+      break;
+    } else {
+      new_path_value.push_back(path_view[i]);
     }
+  }
+  if (new_path_value.size() != len) {
+    const_cast<Http::HeaderEntry*>(path_entry)
+        ->value({new_path_value.data(), new_path_value.size()});
+  }
+
+  if (quick_routes_enabled_) {
     auto iter = quick_routes_.find(
         Http::PathUtil::removeQueryAndFragment(path_entry->value().getStringView()));
     if (iter != quick_routes_.end()) {
