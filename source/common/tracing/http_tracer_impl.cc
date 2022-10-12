@@ -159,6 +159,12 @@ void HttpTracerUtility::finalizeDownstreamSpan(Span& span,
       span.setTag(Tracing::Tags::get().PeerAddress, remote_address->logicalName());
     }
 
+    const auto& downstream_address = stream_info.downstreamAddressProvider().localAddress();
+    if (downstream_address->type() == Network::Address::Type::Ip) {
+      const auto local_ip = downstream_address->ip();
+      span.setTag("downstream_port", std::to_string(local_ip->port()));
+    }
+
     if (request_headers->ClientTraceId()) {
       span.setTag(Tracing::Tags::get().GuidXClientTraceId,
                   request_headers->getClientTraceIdValue());
