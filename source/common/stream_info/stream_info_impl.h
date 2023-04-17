@@ -15,6 +15,7 @@
 #include "source/common/common/dump_state_utils.h"
 #include "source/common/common/macros.h"
 #include "source/common/common/utility.h"
+#include "source/common/protobuf/utility.h"
 #include "source/common/network/socket_impl.h"
 #include "source/common/stream_info/filter_state_impl.h"
 #include "source/common/stream_info/stream_id_provider_impl.h"
@@ -296,7 +297,8 @@ struct StreamInfoImpl : public StreamInfo {
     os << spaces << "StreamInfoImpl " << this << DUMP_OPTIONAL_MEMBER(protocol_)
        << DUMP_OPTIONAL_MEMBER(response_code_) << DUMP_OPTIONAL_MEMBER(response_code_details_)
        << DUMP_OPTIONAL_MEMBER(attempt_count_) << DUMP_MEMBER(health_check_request_)
-       << DUMP_MEMBER(route_name_);
+       << DUMP_MEMBER(route_name_)
+       << DUMP_MEMBER_AS(metadata_, MessageUtil::getJsonStringFromMessageOrError(metadata_));
     DUMP_DETAILS(upstream_info_);
   }
 

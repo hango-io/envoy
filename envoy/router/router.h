@@ -1415,6 +1415,8 @@ public:
    * @return returns the options to be consulted with for upstream stream creation.
    */
   virtual const Http::ConnectionPool::Instance::StreamOptions& upstreamStreamOptions() const PURE;
+
+  virtual const ScopeTrackedObject& scope() const PURE;
 };
 
 /**

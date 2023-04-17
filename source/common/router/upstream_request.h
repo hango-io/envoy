@@ -107,6 +107,7 @@ public:
   const Http::ConnectionPool::Instance::StreamOptions& upstreamStreamOptions() const override {
     return stream_options_;
   }
+  const ScopeTrackedObject& scope() const override;
 
   void disableDataFromDownstreamForFlowControl();
   void enableDataFromDownstreamForFlowControl();

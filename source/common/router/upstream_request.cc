@@ -339,6 +339,7 @@ void UpstreamRequest::dumpState(std::ostream& os, int indent_level) const {
 }
 
 const Route& UpstreamRequest::route() const { return *parent_.route(); }
+const ScopeTrackedObject& UpstreamRequest::scope() const { return parent_.callbacks()->scope(); }
 
 OptRef<const Network::Connection> UpstreamRequest::connection() const {
   return parent_.callbacks()->connection();

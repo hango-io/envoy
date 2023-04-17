@@ -85,6 +85,7 @@ public:
     const Http::ConnectionPool::Instance::StreamOptions& upstreamStreamOptions() const override {
       return filter_.callbacks_->upstreamCallbacks()->upstreamStreamOptions();
     }
+    const ScopeTrackedObject& scope() const override { return filter_.callbacks_->scope(); }
 
   private:
     void maybeEndDecode(bool end_stream);

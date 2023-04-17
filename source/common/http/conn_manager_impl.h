@@ -217,7 +217,14 @@ private:
     // ScopeTrackedObject
     void dumpState(std::ostream& os, int indent_level = 0) const override {
       const char* spaces = spacesForLevel(indent_level);
-      os << spaces << "ActiveStream " << this << DUMP_MEMBER(stream_id_);
+      os << spaces << "ActiveStream " << this << DUMP_MEMBER(stream_id_) << "\n";
+
+      if (cached_route_.has_value() && cached_route_.value() != nullptr) {
+        const char* next_spaces = spacesForLevel(indent_level + 1);
+        os << next_spaces << "Route metadata: "
+           << MessageUtil::getJsonStringFromMessageOrError(cached_route_.value()->metadata())
+           << "\n";
+      }
 
       DUMP_DETAILS(&filter_manager_);
     }
