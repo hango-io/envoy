@@ -72,6 +72,8 @@ void ActiveStreamFilterBase::commonContinue() {
   // filter iteration starts with the current filter instead of the next one.
   if (stoppedAll()) {
     iterate_from_current_filter_ = true;
+  } else {
+    iterate_from_current_filter_ = false;
   }
   allowIteration();
 
