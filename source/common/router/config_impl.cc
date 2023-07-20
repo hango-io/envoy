@@ -2130,6 +2130,19 @@ RouteSpecificFilterConfigConstSharedPtr PerFilterConfigs::createRouteSpecificFil
   Server::Configuration::NamedHttpFilterConfigFactory* factory =
       Envoy::Config::Utility::getFactoryByType<Server::Configuration::NamedHttpFilterConfigFactory>(
           typed_config);
+
+  // Try to find the factory by name. This is deprecated and will be removed as soon as possible.
+  // We keep this hack here to avoid breaking existing users.
+  // We should migrate all old configs and then set the env to disable this hack to test if we
+  // have migrated all configs. Then we can remove this hack.
+  static const bool disable_factory_find_by_name = []() {
+    return std::getenv("ENVOY_DISABLE_FACTORY_FIND_BY_NAME") != nullptr;
+  }();
+  if (factory == nullptr && !disable_factory_find_by_name) {
+    factory = Envoy::Config::Utility::getFactoryByName<
+        Server::Configuration::NamedHttpFilterConfigFactory>(name);
+  }
+
   if (factory == nullptr) {
     if (is_optional) {
       ENVOY_LOG(warn,
