@@ -86,6 +86,9 @@ public:
   bool canary() const override { return logical_host_->canary(); }
   void canary(bool) override {}
   MetadataConstSharedPtr metadata() const override { return logical_host_->metadata(); }
+  const Envoy::Config::TypedMetadata& typedMetadata() const override {
+    return logical_host_->typedMetadata();
+  }
   void metadata(MetadataConstSharedPtr) override {}
 
   Network::UpstreamTransportSocketFactory& transportSocketFactory() const override {

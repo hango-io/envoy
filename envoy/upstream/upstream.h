@@ -846,6 +846,8 @@ public:
 };
 using ProtocolOptionsConfigConstSharedPtr = std::shared_ptr<const ProtocolOptionsConfig>;
 
+class HostTypedMetadataFactory : public Envoy::Config::TypedMetadataFactory {};
+
 /**
  *  Base class for all cluster typed metadata factory.
  */

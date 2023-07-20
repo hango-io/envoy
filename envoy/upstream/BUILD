@@ -71,6 +71,7 @@ envoy_cc_library(
         ":health_check_host_monitor_interface",
         ":outlier_detection_interface",
         ":resource_manager_interface",
+        "//envoy/config:typed_metadata_interface",
         "//envoy/network:address_interface",
         "//envoy/network:transport_socket_interface",
         "//envoy/stats:primitive_stats_macros",
