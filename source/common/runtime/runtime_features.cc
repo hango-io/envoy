@@ -58,7 +58,9 @@ RUNTIME_GUARD(envoy_reloadable_features_immediate_response_use_filter_mutation_r
 RUNTIME_GUARD(envoy_reloadable_features_initialize_upstream_filters);
 RUNTIME_GUARD(envoy_reloadable_features_keep_endpoint_active_hc_status_on_locality_update);
 RUNTIME_GUARD(envoy_reloadable_features_lowercase_scheme);
-RUNTIME_GUARD(envoy_reloadable_features_no_extension_lookup_by_name);
+// TODO(wangbaiping): set the flag to false by default for backward compatibility.
+// RUNTIME_GUARD(envoy_reloadable_features_no_extension_lookup_by_name);
+FALSE_RUNTIME_GUARD(envoy_reloadable_features_no_extension_lookup_by_name);
 RUNTIME_GUARD(envoy_reloadable_features_no_full_scan_certs_on_sni_mismatch);
 RUNTIME_GUARD(envoy_reloadable_features_oauth_header_passthrough_fix);
 RUNTIME_GUARD(envoy_reloadable_features_oauth_make_token_cookie_httponly);
@@ -90,7 +92,10 @@ RUNTIME_GUARD(envoy_reloadable_features_validate_detailed_override_host_statuses
 RUNTIME_GUARD(envoy_reloadable_features_validate_grpc_header_before_log_grpc_status);
 RUNTIME_GUARD(envoy_reloadable_features_validate_upstream_headers);
 RUNTIME_GUARD(envoy_restart_features_explicit_wildcard_resource);
-RUNTIME_GUARD(envoy_restart_features_remove_runtime_singleton);
+// TODO(wangbaiping): set the flag to false by default because most scenarios want to use the
+// singleton runtime.
+// RUNTIME_GUARD(envoy_restart_features_remove_runtime_singleton);
+FALSE_RUNTIME_GUARD(envoy_restart_features_remove_runtime_singleton);
 RUNTIME_GUARD(envoy_restart_features_udp_read_normalize_addresses);
 RUNTIME_GUARD(envoy_restart_features_use_apple_api_for_dns_lookups);
 
