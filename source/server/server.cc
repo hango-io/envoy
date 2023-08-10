@@ -677,7 +677,8 @@ void InstanceImpl::initialize(Network::Address::InstanceConstSharedPtr local_add
   // Runtime gets initialized before the main configuration since during main configuration
   // load things may grab a reference to the loader for later use.
   Runtime::LoaderPtr runtime_ptr = component_factory.createRuntime(*this, initial_config);
-  if (runtime_ptr->snapshot().getBoolean("envoy.restart_features.remove_runtime_singleton", true)) {
+  if (runtime_ptr->snapshot().getBoolean("envoy.restart_features.remove_runtime_singleton",
+                                         false)) {
     runtime_ = std::move(runtime_ptr);
   } else {
     runtime_singleton_ = std::make_unique<Runtime::ScopedLoaderSingleton>(std::move(runtime_ptr));
