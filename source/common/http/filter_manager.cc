@@ -20,6 +20,17 @@ namespace Http {
 
 namespace {
 
+bool enablePerFilterConfigNameDowngrade() {
+  static const bool enable = []() -> bool {
+    const auto* env = std::getenv("ENVOY_ENABLE_PER_FILTER_CONFIG_NAME_DOWNGRADE");
+    if (env != nullptr) {
+      return std::string(env) == "true";
+    }
+    return false;
+  }();
+  return enable;
+}
+
 template <class T> using FilterList = std::list<std::unique_ptr<T>>;
 
 // Shared helper for recording the latest filter used.
@@ -286,7 +297,8 @@ ActiveStreamFilterBase::mostSpecificPerFilterConfig() const {
 
   auto* result = current_route->mostSpecificPerFilterConfig(filter_context_.config_name);
 
-  if (result == nullptr && filter_context_.filter_name != filter_context_.config_name) {
+  if (enablePerFilterConfigNameDowngrade() && result == nullptr &&
+      filter_context_.filter_name != filter_context_.config_name) {
     // Fallback to use filter name.
     result = current_route->mostSpecificPerFilterConfig(filter_context_.filter_name);
   }
@@ -308,7 +320,8 @@ void ActiveStreamFilterBase::traversePerFilterConfig(
         cb(config);
       });
 
-  if (handled || filter_context_.filter_name == filter_context_.config_name) {
+  if (!enablePerFilterConfigNameDowngrade() || handled ||
+      filter_context_.filter_name == filter_context_.config_name) {
     return;
   }
 
