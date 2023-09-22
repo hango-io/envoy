@@ -24,7 +24,7 @@ public:
               RpcResponseType type) override;
 
   static constexpr uint8_t MessageSize = 16;
-  static constexpr int32_t MaxBodySize = 16 * 1024 * 1024;
+  static constexpr int32_t MaxBodySize = 32 * 1024 * 1024;
 };
 
 } // namespace DubboProxy
